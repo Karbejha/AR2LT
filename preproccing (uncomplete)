@@ -1,0 +1,37 @@
+import cv2
+import cv2 as cv
+import numpy as np
+from matplotlib import pyplot as plt
+
+######## read image and covert it to greyscale
+image1=cv2.imread('capr12.png')
+grey_img=cv2.cvtColor(image1,cv2.COLOR_BGR2GRAY)
+################## blur image
+blur=cv2.GaussianBlur(grey_img,(7,7),0)
+cv2.imshow('blur', blur)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+########## threshhold and applying otsu binirization
+thresh = cv2.threshold(blur, 0, 255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)[1]
+cv2.imshow('thresh', thresh)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+#####################
+kernal=cv2.getStructuringElement(cv2.MORPH_RECT,(2,3))
+############### dilation
+dilate=cv2.dilate(thresh,kernal,iterations=1)
+cv2.imshow('dilate', dilate)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+############# finding conturs 
+cnts=cv2.findContours(dilate,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+cnts=cnts[0] if len(cnts)==2 else cents[1]
+cnts=sorted(cnts,key=lambda x:cv2.boundingRect(x)[0])
+for c in cnts:
+    x,y,w,h=cv2.boundingRect(c)
+    cv2.rectangle(image1,(x,y),(x+w,y+h),(36,255,12),2)
+cv2.imshow('final',image1)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
